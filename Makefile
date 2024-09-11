@@ -1,0 +1,16 @@
+POSTGRES_USER = postgres
+POSTGRES_PASSWORD = postgres
+POSTGRES_DB = postgres
+POSTGRES_PORT ?= 5432
+
+postgres:
+	docker run \
+		--rm -it \
+		-p 5432:$(POSTGRES_PORT) \
+		-e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		$(POSTGRES_DB)
+
+TEST_COUNT ?= 1
+
+test:
+	DATABASE_URL=postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@127.0.0.1:$(POSTGRES_PORT)/$(POSTGRES_DB) go test -v -count $(TEST_COUNT) .
