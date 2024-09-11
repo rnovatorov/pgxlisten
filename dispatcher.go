@@ -55,13 +55,12 @@ func (d *dispatcher) Err() error {
 }
 
 func (d *dispatcher) run(ctx context.Context) error {
-	conn, err := d.pool.Acquire(ctx)
+	conn, err := d.hijackConn(ctx)
 	if err != nil {
-		return fmt.Errorf("acquire conn: %w", err)
+		return fmt.Errorf("hijack conn: %w", err)
 	}
 	defer func() {
-		_ = conn.Conn().Close(ctx)
-		conn.Release()
+		_ = conn.Close(ctx)
 	}()
 
 	for name, c := range d.channels {
@@ -80,7 +79,7 @@ func (d *dispatcher) run(ctx context.Context) error {
 	}
 
 	for {
-		notification, err := conn.Conn().WaitForNotification(ctx)
+		notification, err := conn.WaitForNotification(ctx)
 		if err != nil {
 			return fmt.Errorf("wait for notification: %w", err)
 		}
@@ -97,4 +96,13 @@ func (d *dispatcher) run(ctx context.Context) error {
 		case c.notifications <- Notification{Payload: notification.Payload}:
 		}
 	}
+}
+
+func (d *dispatcher) hijackConn(ctx context.Context) (*pgx.Conn, error) {
+	conn, err := d.pool.Acquire(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn.Hijack(), nil
 }
