@@ -27,7 +27,7 @@ for notification := range channel.Notifications() {
 }
 ```
 
-For more something more realistic check out [examples](examples).
+For something more realistic check out [examples](examples).
 
 ## Alternatives
 
