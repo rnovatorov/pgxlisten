@@ -27,6 +27,8 @@ for notification := range channel.Notifications() {
 }
 ```
 
+For more something more realistic check out [examples](examples).
+
 ## Alternatives
 
 1. Directly using `WaitForNotification`.
@@ -44,14 +46,14 @@ The API of this library is similar to that of https://github.com/jackc/pgxlisten
 - listenerCtx, listenerCtxCancel := context.WithCancel(ctx)
 - defer listenerCtxCancel()
 - listenerDoneChan := make(chan struct{})
-- 
+-
 - go func() {
 - 	listener.Listen(listenerCtx)
 - 	close(listenerDoneChan)
 - }()
-- 
+-
 - // do other stuff
-- 
+-
 - listenerCtxCancel()
 - <-listenerDoneChan
 
